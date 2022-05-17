@@ -1,0 +1,36 @@
+app-id: com.github.giantpinkrobots.bootqt
+runtime: org.kde.Platform
+runtime-version: '5.15-21.08'
+sdk: org.kde.Sdk
+base: com.riverbankcomputing.PyQt.BaseApp
+base-version: 5.15-21.08
+
+command: bootqt
+
+finish-args:
+  - --device=all
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --filesystem=host
+  - --talk-name=org.freedesktop.Flatpak
+
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
+build-options:
+  env:
+    - BASEAPP_REMOVE_WEBENGINE=1
+  
+modules:
+  - name: bootqt
+    buildsystem: simple
+    build-commands:
+      - install -D -m755 bootqt.sh /app/bin/bootqt
+      - install -D -m755 bootqt-flatpakversion.py -t /app/lib/bootqt
+    
+    sources:
+      - type: git
+        url: https://github.com/giantpinkrobots/bootqt.git
+        commit: 0e36db2722e062c1b51052fc83bb1de13a895c8d
+      - type: file
+        path: bootqt.sh
