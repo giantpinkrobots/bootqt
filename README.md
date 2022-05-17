@@ -26,3 +26,7 @@ Upon first usage it will create two hidden folders named ".BOOTQT_USBMOUNT" and 
 # Why?
 
 I know there are many other alternatives to Bootqt. But I wanted to try making an app using Qt. This is my first such project. Also I haven't seen such a tool that is made with Qt and integrates well with KDE Plasma.
+
+# Special Thanks
+
+Thanks to [@zocker-160](https://github.com/zocker-160) for giving me support on making Bootqt Flatpak compatible, going as far as writing the Flatpak yml file for me.
