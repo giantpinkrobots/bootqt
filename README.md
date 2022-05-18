@@ -21,7 +21,6 @@ Afterwards just run the script like so:
 ```
 python3 ./bootqt.py
 ```
-Upon first usage it will create two hidden folders named ".BOOTQT_USBMOUNT" and ".BOOTQT_IMGMOUNT". These folders are necessary because the drive and the image file are mounted there. So if you have two folders named these way, you should run Bootqt in a directory that does not have such folders.
 
 # Why?
 
