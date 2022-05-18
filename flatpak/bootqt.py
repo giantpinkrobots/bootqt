@@ -83,7 +83,7 @@ class bootqt(QWidget):
                 self.isWriting = 1;
                 self.statusText.setText("Status: Writing")
                 self.text.appendPlainText("Write started. ("+time.strftime("%H:%M:%S", time.localtime())+")")
-                self.write_command = "dd bs=4M if="+self.selected_image+" of="+selected_drive+" status=progress oflag=sync"
+                self.write_command = "dd bs=4M if=\""+self.selected_image+"\" of="+selected_drive+" status=progress oflag=sync"
                 if (self.isFlatpak == 1):
                     os.popen("flatpak-spawn --host umount "+selected_drive+"*")
                     self.write_command_exec = ["--host", "pkexec", "sh", "-c", self.write_command]
