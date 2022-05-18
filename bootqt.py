@@ -1,15 +1,13 @@
+#Bootqt v0.3
 import sys
 import os
+import time
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit
 from PyQt5.QtCore import QProcess
 
 class bootqt(QWidget):
     def __init__(self):
-        #Create necessary mounting folders:
-        if not os.path.exists(os.getcwd()+"/.BOOTQT_USBMOUNT"):
-            os.makedirs(os.getcwd()+"/.BOOTQT_USBMOUNT")
-        if not os.path.exists(os.getcwd()+"/.BOOTQT_IMGMOUNT"):
-            os.makedirs(os.getcwd()+"/.BOOTQT_IMGMOUNT")
+        self.isFlatpak = 0 # 1 = is flatpak, 0 = is standalone python script
 
         super().__init__()
         self.setMinimumSize(400,300)
@@ -84,13 +82,23 @@ class bootqt(QWidget):
                 #Start writing
                 self.isWriting = 1;
                 self.statusText.setText("Status: Writing")
-                self.write_command_exec = ["sh", "-c", "umount "+selected_drive+"*; wipefs --all "+selected_drive+"; parted --script "+selected_drive+" mklabel msdos; parted --script "+selected_drive+" mkpart pri 1MiB 100%; partprobe; mkfs.fat -F32 -I -v "+selected_drive+"1; fatlabel "+selected_drive+"1 BOOTABLEUSB; umount "+selected_drive+"*; umount \""+os.getcwd()+"/.BOOTQT_USBMOUNT\"; umount \""+os.getcwd()+"/.BOOTQT_IMGMOUNT\";  mount \""+self.selected_image+"\" \""+os.getcwd()+"/.BOOTQT_IMGMOUNT\";  mount "+selected_drive+"1 \""+os.getcwd()+"/.BOOTQT_USBMOUNT\"; cp --archive --verbose \""+os.getcwd()+"/.BOOTQT_IMGMOUNT\"/* \""+os.getcwd()+"/.BOOTQT_USBMOUNT\"/; umount \""+os.getcwd()+"/.BOOTQT_IMGMOUNT\"; umount \""+os.getcwd()+"/.BOOTQT_USBMOUNT\""]
+                self.text.appendPlainText("Write started. ("+time.strftime("%H:%M:%S", time.localtime())+")")
+                self.write_command = "dd bs=4M if="+self.selected_image+" of="+selected_drive+" status=progress oflag=sync"
+                if (self.isFlatpak == 1):
+                    os.popen("flatpak-spawn --host umount "+selected_drive+"*")
+                    self.write_command_exec = ["--host", "pkexec", "sh", "-c", self.write_command]
+                else:
+                    os.popen("umount "+selected_drive+"*")
+                    self.write_command_exec = ["sh", "-c", self.write_command]
                 self.process_write = QProcess()
-                self.process_write.readyReadStandardOutput.connect(self.write_stdout)
-                self.process_write.readyReadStandardError.connect(self.write_stderr)
+                self.process_write.readyReadStandardOutput.connect(self.write_output)
+                self.process_write.readyReadStandardError.connect(self.write_output)
                 self.process_write.finished.connect(self.write_finished)
                 self.process_write.setProgram
-                self.process_write.setProgram("pkexec")
+                if (self.isFlatpak == 1):
+                    self.process_write.setProgram("flatpak-spawn")
+                else:
+                    self.process_write.setProgram("pkexec")
                 self.process_write.setArguments(self.write_command_exec)
                 self.process_write.start()
 
@@ -109,19 +117,17 @@ class bootqt(QWidget):
         )
         if showDialog[0] != "":
             self.selected_image = showDialog[0]
-    
-    def write_stderr(self):
-        data = self.process_write.readAllStandardError()
-        stderr = bytes(data).decode("utf8")
-        self.text.appendPlainText(stderr)
 
-    def write_stdout(self):
-        data = self.process_write.readAllStandardOutput()
-        stdout = bytes(data).decode("utf8")
-        self.text.appendPlainText(stdout)
+    def write_output(self):
+        output = bytes(self.process_write.readAllStandardError()).decode("utf8")
+        if("bytes (" in output) and (") copied, " in output):
+            output = output.split("(")
+            output = output[1].split(", ")
+            output = output[2]+" - "+output[0]+" copied ("+output[3]+")"
+        self.text.appendPlainText(output)
 
     def write_finished(self):
-        self.text.appendPlainText("Write finished.")
+        self.text.appendPlainText("Write finished. ("+time.strftime("%H:%M:%S", time.localtime())+")")
         info_message = QMessageBox()
         info_message.setText("Writing process finished.")
         info_message.setWindowTitle("Finished")
