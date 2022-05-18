@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=bootqt.sh
+Icon=com.github.giantpinkrobots.bootqt
+Name=Bootqt
+Comment=Create bootable drives
+Categories=Utility
