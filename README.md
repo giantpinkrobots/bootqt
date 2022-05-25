@@ -29,3 +29,4 @@ I know there are many other alternatives to Bootqt. But I wanted to try making a
 # Special Thanks
 
 Thanks to [@zocker-160](https://github.com/zocker-160) for giving me support on making Bootqt Flatpak compatible, going as far as writing the Flatpak yml file for me.
+A friend for their help on German localization.
