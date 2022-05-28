@@ -11,11 +11,11 @@ global text_imageselected, text_selectdrive, text_button_selectimagefile, text_s
 
 #i18n
 localename = locale.getdefaultlocale()
-if ((localename[0].startswith("tr_")) and (os.path.exists("./bqi18n/da.py"))):
+if ((localename[0].startswith("da_")) and (os.path.exists("./bqi18n/da.py"))):
     from bqi18n.da import *
 elif ((localename[0].startswith("de_")) and (os.path.exists("./bqi18n/de.py"))):
     from bqi18n.de import *
-elif ((localename[0].startswith("da_")) and (os.path.exists("./bqi18n/tr.py"))):
+elif ((localename[0].startswith("tr_")) and (os.path.exists("./bqi18n/tr.py"))):
     from bqi18n.tr import *
 else: #Default to English
     text_imageselected = "Image selected:"
