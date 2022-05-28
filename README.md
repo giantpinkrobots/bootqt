@@ -13,12 +13,15 @@ Bootqt is a simple app for making a bootable USB drive from an ISO or IMG file. 
 
 # Languages
 
-Bootqt currently supports three languages:
+Bootqt currently supports four languages:
 - English
+- Danish (Dansk)
 - German (Deutsch)
 - Turkish (Türkçe)
 
-Localising Bootqt is very simple. If you want to translate it to a language you speak, feel free to do so! Or hit me up for details on how to do it.
+To use them, download the bqi18n folder alongside the bootqt.py file. It will automatically get your locale from your computer.
+
+Localising Bootqt is very simple. If you want to translate it to a language you speak, please feel free to do so! Or hit me up for details on how to do it.
 
 # How to install
 
