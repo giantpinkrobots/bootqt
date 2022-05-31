@@ -13,7 +13,7 @@ Bootqt is a simple app for making a bootable USB drive from an ISO or IMG file. 
 
 # Languages
 
-Bootqt currently supports four languages:
+Bootqt currently supports five languages:
 - English
 - Danish (Dansk)
 - German (Deutsch)
