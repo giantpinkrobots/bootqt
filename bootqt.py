@@ -1,4 +1,4 @@
-#Bootqt v2022.5.28
+#Bootqt v2022.5.31
 import sys
 import os
 import time
@@ -14,7 +14,7 @@ isFlatpak = 0 # 1 = is flatpak, 0 = is standalone python script
 #i18n
 localename = locale.getdefaultlocale()
 if (isFlatpak == 0): i18ndir = "./bqi18n/"
-else: i18ndir = "/app/lib/bootqt/"
+else: i18ndir = "/app/lib/bootqt/bqi18n/"
 if ((localename[0].startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
     from bqi18n.da import *
 elif ((localename[0].startswith("de_")) and (os.path.exists(i18ndir + "de.py"))):
