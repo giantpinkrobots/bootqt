@@ -7,15 +7,19 @@ from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFile
 from PyQt5.QtCore import QProcess
 from PyQt5.QtGui import QIcon
 
-global text_imageselected, text_selectdrive, text_button_selectimagefile, text_selectimagefile, text_imagefile, text_button_preparedrive, text_status, text_ready, text_writing, text_error, text_errorwait, text_nodrive, text_noimage, text_areyousure, text_drivewillbewiped, text_imagewillbewritten, text_writestarted, text_writefinished, text_finished, text_copied
+global isFlatpak, text_imageselected, text_selectdrive, text_button_selectimagefile, text_selectimagefile, text_imagefile, text_button_preparedrive, text_status, text_ready, text_writing, text_error, text_errorwait, text_nodrive, text_noimage, text_areyousure, text_drivewillbewiped, text_imagewillbewritten, text_writestarted, text_writefinished, text_finished, text_copied
+
+isFlatpak = 0 # 1 = is flatpak, 0 = is standalone python script
 
 #i18n
 localename = locale.getdefaultlocale()
-if ((localename[0].startswith("da_")) and (os.path.exists("./bqi18n/da.py"))):
+if (isFlatpak == 0): i18ndir = "./bqi18n/"
+else: i18ndir = "/app/lib/bootqt/"
+if ((localename[0].startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
     from bqi18n.da import *
-elif ((localename[0].startswith("de_")) and (os.path.exists("./bqi18n/de.py"))):
+elif ((localename[0].startswith("de_")) and (os.path.exists(i18ndir + "de.py"))):
     from bqi18n.de import *
-elif ((localename[0].startswith("tr_")) and (os.path.exists("./bqi18n/tr.py"))):
+elif ((localename[0].startswith("tr_")) and (os.path.exists(i18ndir + "tr.py"))):
     from bqi18n.tr import *
 else: #Default to English
     text_imageselected = "Image selected:"
@@ -41,12 +45,10 @@ else: #Default to English
 
 class bootqt(QWidget):
     def __init__(self):
-        self.isFlatpak = 0 # 1 = is flatpak, 0 = is standalone python script
-
         super().__init__()
         self.setMinimumSize(400,300)
         self.setWindowTitle("Bootqt")
-        if (self.isFlatpak == 1):
+        if (isFlatpak == 1):
             self.setWindowIcon(QIcon("/app/lib/bootqt/bqlogo.png"))
         else:
             self.setWindowIcon(QIcon("./bqlogo.png"))
@@ -125,7 +127,7 @@ class bootqt(QWidget):
                 self.text.appendPlainText(text_writestarted+" ("+time.strftime("%H:%M:%S", time.localtime())+")")
                 selected_drive_code = selected_drive.split(" ");
                 self.write_command = "dd bs=4M if=\""+self.selected_image+"\" of="+selected_drive_code[0]+" status=progress oflag=sync"
-                if (self.isFlatpak == 1):
+                if (isFlatpak == 1):
                     os.popen("flatpak-spawn --host umount "+selected_drive_code[0]+"*")
                     self.write_command_exec = ["--host", "pkexec", "sh", "-c", self.write_command]
                 else:
@@ -136,7 +138,7 @@ class bootqt(QWidget):
                 self.process_write.readyReadStandardError.connect(self.write_output)
                 self.process_write.finished.connect(self.write_finished)
                 self.process_write.setProgram
-                if (self.isFlatpak == 1):
+                if (isFlatpak == 1):
                     self.process_write.setProgram("flatpak-spawn")
                 else:
                     self.process_write.setProgram("pkexec")
