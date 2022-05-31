@@ -1,4 +1,4 @@
-#Bootqt v2022.5.31
+#Bootqt v2022.5.31.1
 import sys
 import os
 import time
@@ -19,6 +19,8 @@ if ((localename[0].startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
     from bqi18n.da import *
 elif ((localename[0].startswith("de_")) and (os.path.exists(i18ndir + "de.py"))):
     from bqi18n.de import *
+elif ((localename[0].startswith("it_")) and (os.path.exists(i18ndir + "it.py"))):
+    from bqi18n.it import *
 elif ((localename[0].startswith("tr_")) and (os.path.exists(i18ndir + "tr.py"))):
     from bqi18n.tr import *
 else: #Default to English
