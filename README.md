@@ -17,6 +17,7 @@ Bootqt currently supports four languages:
 - English
 - Danish (Dansk)
 - German (Deutsch)
+- Italian (Italiano)
 - Turkish (Türkçe)
 
 To use them, download the bqi18n folder alongside the bootqt.py file. It will automatically get your locale from your computer.
@@ -42,3 +43,4 @@ I know there are many other alternatives to Bootqt. But I wanted to try making a
 
 - Thanks to [@zocker-160](https://github.com/zocker-160) for giving me support on making Bootqt Flatpak compatible, going as far as writing the initial Flatpak yml file for me.
 - Thanks to my friends for their help on German and Danish localization.
+- Thanks to [@albanobattistella](https://github.com/albanobattistella)
