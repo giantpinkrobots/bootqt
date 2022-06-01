@@ -1,9 +1,14 @@
 # Bootqt
+
+<a href='https://flathub.org/apps/details/io.github.giantpinkrobots.bootqt'><img width='240' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
+
 Bootqt - Bootable USB writer using Qt.
 
 ![Bootqt](/Screenshot-Bootqt.png?raw=true "Bootqt")
 
 Bootqt is a simple app for making a bootable USB drive from an ISO or IMG file. It is written in Python and uses Qt technologies to provide an easy to use graphical user interface.
+
+*** Bootqt is for Linux only at the time. ***
 
 # How to use
 
@@ -26,7 +31,18 @@ Localising Bootqt is very simple. If you want to translate it to a language you 
 
 # How to install
 
-Bootqt requires Python and PyQt5. It is also available on Linux only. First, you have to get PyQt5. Here is how you can get it via pip:
+If your computer has [Flatpak support](https://flatpak.org/setup/), you can install Bootqt through the Flathub repo by just searching for Bootqt in your application store (Discover, Software, etc) or by going to [this page](https://flathub.org/apps/details/io.github.giantpinkrobots.bootqt) and getting the flatpakref file by pressing Install. Then, just run the flatpakref file to open it via your application store.
+
+Or you can install it through the terminal:
+```
+flatpak install flathub io.github.giantpinkrobots.bootqt
+```
+If you don't have the Flathub repo enabled, you have to run this command first to add it to your computer:
+```
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
+#
+If you don't want to install through Flatpak, you have to download the "bootqt.py" file (not the one in the flatpak directory) and download the "bqi18n" folder if you want localization to work. Then, you'll need PyQt5. Here is how you can get it via pip:
 ```
 pip install PyQt5
 ```
