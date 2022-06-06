@@ -4,7 +4,7 @@
 
 Bootqt - Bootable USB writer using Qt.
 
-![Bootqt](/Screenshot-Bootqt.png?raw=true "Bootqt")
+![Bootqt](/screenshots/Screenshot-Bootqt-1.png?raw=true "Bootqt")
 
 Bootqt is a simple app for making a bootable USB drive from an ISO or IMG file. It is written in Python and uses Qt technologies to provide an easy to use graphical user interface.
 
