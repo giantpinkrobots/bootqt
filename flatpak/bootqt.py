@@ -1,9 +1,9 @@
-#Bootqt v2022.5.31.1
+#Bootqt v2022.6.6
 import sys
 import os
 import time
 import locale
-from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar
 from PyQt5.QtCore import QProcess
 from PyQt5.QtGui import QIcon
 
@@ -48,7 +48,8 @@ else: #Default to English
 class bootqt(QWidget):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(400,300)
+        self.setMinimumSize(400,253)
+        self.setMaximumSize(400,253)
         self.setWindowTitle("Bootqt")
         if (isFlatpak == 1):
             self.setWindowIcon(QIcon("/app/lib/bootqt/bqlogo.png"))
@@ -61,7 +62,8 @@ class bootqt(QWidget):
         self.selected_image = ""
         self.textLabel = text_imageselected+"\n" + self.selected_image
 
-        self.isWriting = 0;
+        self.isWriting = 0
+        self.copiedamount = 0
 
         #Get drive list:
         drive_list = []
@@ -94,10 +96,27 @@ class bootqt(QWidget):
         self.statusText.setText(text_status + " " + text_ready)
         layout.addWidget(self.statusText)
 
+        #Status text 2
+        self.statusText2 = QLabel()
+        self.statusText2.setText("")
+        layout.addWidget(self.statusText2)
+
+        #Progress bar
+        self.progressBar = QProgressBar(self)
+        self.progressBar.setValue(0)
+        layout.addWidget(self.progressBar)
+
         #Console
         self.text = QPlainTextEdit()
         self.text.setReadOnly(True)
         layout.addWidget(self.text)
+        self.text.hide()
+        self.consoleHidden = 1
+
+        #Show console button
+        self.button_showconsole = QPushButton("▼")
+        self.button_showconsole.clicked.connect(self.showconsole)
+        layout.addWidget(self.button_showconsole)
 
     def writeToUSB(self):
         if (self.isWriting == 1):
@@ -124,17 +143,24 @@ class bootqt(QWidget):
             start_write = question_message.question(self,text_areyousure, text_drivewillbewiped+"\n" + selected_drive + "\n\n"+text_imagewillbewritten+"\n" + self.selected_image + "\n\n"+text_areyousure, question_message.Yes | question_message.No)
             if start_write == question_message.Yes:
                 #Start writing
-                self.isWriting = 1;
-                self.statusText.setText(text_status + " " + text_writing)
+                self.isWriting = 1
+                self.copiedamount = 0
+                self.progressBar.setValue(0)
                 self.text.appendPlainText(text_writestarted+" ("+time.strftime("%H:%M:%S", time.localtime())+")")
                 selected_drive_code = selected_drive.split(" ");
                 self.write_command = "dd bs=4M if=\""+self.selected_image+"\" of="+selected_drive_code[0]+" status=progress oflag=sync"
                 if (isFlatpak == 1):
+                    self.selected_image_size = (os.popen("flatpak-spawn --host stat \""+self.selected_image+"\" | grep \"Size:\"").read()).split(" ")
                     os.popen("flatpak-spawn --host umount "+selected_drive_code[0]+"*")
                     self.write_command_exec = ["--host", "pkexec", "sh", "-c", self.write_command]
                 else:
+                    self.selected_image_size = (os.popen("stat \""+self.selected_image+"\" | grep \"Size:\"").read()).split(" ")
                     os.popen("umount "+selected_drive_code[0]+"*")
                     self.write_command_exec = ["sh", "-c", self.write_command]
+                self.selected_image_size = self.selected_image_size[3].split("\t")
+                self.selected_image_size = round((( (float(self.selected_image_size[0]) / 1024 ) / 1024 ) / 1024 ), 2)
+                self.statusText.setText(text_status + " " + text_writing)
+                self.statusText2.setText("0B " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
                 self.process_write = QProcess()
                 self.process_write.readyReadStandardOutput.connect(self.write_output)
                 self.process_write.readyReadStandardError.connect(self.write_output)
@@ -169,17 +195,49 @@ class bootqt(QWidget):
             output = output.replace("copied", text_copied)
             output = output.split("(")
             output = output[1].split(", ")
+            copiedpersecond = output[3].split(" ")
+            self.statusText.setText(text_status + " " + text_writing)
+            self.statusText2.setText(output[0] + " " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
+            #Percentage calculation
+            if (copiedpersecond[1].startswith("B/s")):
+                self.copiedamount = self.copiedamount + (((float((copiedpersecond[0]).replace(",",".")) / 1024) / 1024) / 1024)
+            elif (copiedpersecond[1].startswith("KB/s")):
+                self.copiedamount = self.copiedamount + ((float((copiedpersecond[0]).replace(",",".")) / 1024) / 1024)
+            elif (copiedpersecond[1].startswith("MB/s")):
+                self.copiedamount = self.copiedamount + (float(copiedpersecond[0].replace(",",".")) / 1024)
+            elif (copiedpersecond[1].startswith("GB/s")):
+                self.copiedamount = self.copiedamount + float(copiedpersecond[0].replace(",","."))
+            percentage = round(((self.copiedamount / self.selected_image_size) * 100))
+            self.progressBar.setValue(percentage)
             output = output[2]+" - "+output[0]+" "+text_copied+" ("+output[3]+")"
         self.text.appendPlainText(output)
 
     def write_finished(self):
+        self.progressBar.setValue(100)
         self.text.appendPlainText(text_writefinished+" ("+time.strftime("%H:%M:%S", time.localtime())+")")
         info_message = QMessageBox()
         info_message.setText(text_writefinished)
         info_message.setWindowTitle(text_finished)
         info_message.exec_()
-        self.isWriting = 0;
+        self.isWriting = 0
         self.statusText.setText(text_status + " " + text_ready)
+        self.statusText2.setText("")
+    
+    def showconsole(self):
+        if (self.consoleHidden == 1):
+            self.text.show()
+            self.consoleHidden = 0
+            self.button_showconsole.setText("▲")
+            self.setMinimumSize(400,500)
+            self.setMaximumSize(400,500)
+            self.resize(400,500)
+        else:
+            self.text.hide()
+            self.consoleHidden = 1
+            self.button_showconsole.setText("▼")
+            self.setMinimumSize(400,253)
+            self.setMaximumSize(400,253)
+            self.resize(400,253)
 
 if __name__ == "__main__":
     program = QApplication(sys.argv)
