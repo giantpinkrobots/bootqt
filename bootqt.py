@@ -1,4 +1,4 @@
-#Bootqt v2023.2.17
+#Bootqt v2023.2.17-1
 import sys
 import os
 import time
@@ -154,12 +154,11 @@ class bootqt(QWidget):
                 if (isFlatpak == 1):
                     self.selected_image_size = (os.popen("flatpak-spawn --host ls -l \""+self.selected_image+"\"").read()).split(" ")[4]
                     os.popen("flatpak-spawn --host umount "+selected_drive_code[0]+"*")
-                    self.write_command_exec = ["--host", "pkexec", "sh", "-c", self.write_command]
+                    self.write_command_exec = ["--host", "--env=LANG=en_US.UTF-8", "pkexec", "sh", "-c", self.write_command]
                 else:
                     self.selected_image_size = (os.popen("ls -l \""+self.selected_image+"\"").read()).split(" ")[4]
                     os.popen("umount "+selected_drive_code[0]+"*")
                     self.write_command_exec = ["sh", "-c", self.write_command]
-                #self.selected_image_size = self.selected_image_size[3].split("\t")
                 self.selected_image_size = round((( (float(self.selected_image_size) / 1024 ) / 1024 ) / 1024 ), 2)
                 self.statusText.setText(text_status + " " + text_writing)
                 self.statusText2.setText("0B " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
@@ -212,7 +211,7 @@ class bootqt(QWidget):
                 self.copiedamount = self.copiedamount + (float(copiedpersecond[0].replace(",",".")) / 1024)
             elif (copiedpersecond[1].startswith("GB/s")):
                 self.copiedamount = self.copiedamount + float(copiedpersecond[0].replace(",","."))
-            percentage = round(((self.copiedamount / (self.selected_image_size*1.014)) * 100))
+            percentage = round(((self.copiedamount / (self.selected_image_size*1.0105)) * 100))
             self.progressBar.setValue(percentage)
             output = output[2]+" - "+output[0]+" "+text_copied+" ("+output[3]+")"
         self.text.appendPlainText(output)
@@ -227,7 +226,7 @@ class bootqt(QWidget):
         self.isWriting = 0
         self.statusText.setText(text_status + " " + text_ready)
         self.statusText2.setText("")
-    
+
     def showconsole(self):
         if (self.consoleHidden == 1):
             self.text.show()
