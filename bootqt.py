@@ -1,4 +1,4 @@
-#Bootqt v2023.2.17-1
+#Bootqt v2023.9.30
 import sys
 import os
 import time
@@ -9,10 +9,14 @@ from PyQt5.QtGui import QIcon
 
 global isFlatpak, text_imageselected, text_selectdrive, text_button_selectimagefile, text_selectimagefile, text_imagefile, text_button_preparedrive, text_status, text_ready, text_writing, text_error, text_errorwait, text_nodrive, text_noimage, text_areyousure, text_drivewillbewiped, text_imagewillbewritten, text_writestarted, text_writefinished, text_finished, text_copied
 
-isFlatpak = 0 # 1 = is flatpak, 0 = is standalone python script
+flatpakTest = os.popen("LANG=en_US.UTF-8 flatpak-spawn --help")
+if ("Usage:" in flatpakTest.readline()):
+    isFlatpak = 1
+else:
+    isFlatpak = 0
 
 #i18n
-localename = locale.getdefaultlocale()
+localename = locale.getlocale()
 if (isFlatpak == 0): i18ndir = "./bqi18n/"
 else: i18ndir = "/app/lib/bootqt/bqi18n/"
 if ((localename[0].startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
@@ -159,6 +163,7 @@ class bootqt(QWidget):
                     self.selected_image_size = (os.popen("ls -l \""+self.selected_image+"\"").read()).split(" ")[4]
                     os.popen("umount "+selected_drive_code[0]+"*")
                     self.write_command_exec = ["sh", "-c", self.write_command]
+                self.selected_image_size_bytes = float(self.selected_image_size)
                 self.selected_image_size = round((( (float(self.selected_image_size) / 1024 ) / 1024 ) / 1024 ), 2)
                 self.statusText.setText(text_status + " " + text_writing)
                 self.statusText2.setText("0B " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
@@ -196,22 +201,16 @@ class bootqt(QWidget):
     def write_output(self):
         output = bytes(self.process_write.readAllStandardError()).decode("utf8")
         if("bytes (" in output) and (") copied, " in output):
+            self.copiedamount = int(output.split(" ")[0])
             output = output.replace("copied", text_copied)
             output = output.split("(")
             output = output[1].split(", ")
-            copiedpersecond = output[3].split(" ")
-            self.statusText.setText(text_status + " " + text_writing)
+        
+            self.statusText.setText(text_status + " " + text_writing + " | " + output[3])
             self.statusText2.setText(output[0] + " " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
+
             #Percentage calculation
-            if (copiedpersecond[1].startswith("B/s")):
-                self.copiedamount = self.copiedamount + (((float((copiedpersecond[0]).replace(",",".")) / 1024) / 1024) / 1024)
-            elif (copiedpersecond[1].startswith("KB/s")):
-                self.copiedamount = self.copiedamount + ((float((copiedpersecond[0]).replace(",",".")) / 1024) / 1024)
-            elif (copiedpersecond[1].startswith("MB/s")):
-                self.copiedamount = self.copiedamount + (float(copiedpersecond[0].replace(",",".")) / 1024)
-            elif (copiedpersecond[1].startswith("GB/s")):
-                self.copiedamount = self.copiedamount + float(copiedpersecond[0].replace(",","."))
-            percentage = round(((self.copiedamount / (self.selected_image_size*1.0105)) * 100))
+            percentage = round(((self.copiedamount / (self.selected_image_size_bytes)) * 100))
             self.progressBar.setValue(percentage)
             output = output[2]+" - "+output[0]+" "+text_copied+" ("+output[3]+")"
         self.text.appendPlainText(output)
@@ -232,16 +231,16 @@ class bootqt(QWidget):
             self.text.show()
             self.consoleHidden = 0
             self.button_showconsole.setText("▲")
+            self.resize(400,450)
             self.setMinimumSize(400,450)
             self.setMaximumSize(400,450)
-            self.resize(400,450)
         else:
             self.text.hide()
             self.consoleHidden = 1
             self.button_showconsole.setText("▼")
+            self.resize(400,253)
             self.setMinimumSize(400,253)
             self.setMaximumSize(400,253)
-            self.resize(400,253)
 
 if __name__ == "__main__":
     program = QApplication(sys.argv)
