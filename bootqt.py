@@ -1,4 +1,4 @@
-#Bootqt v2023.9.30
+#Bootqt v2024.1.4
 import sys
 import os
 import time
@@ -201,11 +201,14 @@ class bootqt(QWidget):
     def write_output(self):
         output = bytes(self.process_write.readAllStandardError()).decode("utf8")
         if("bytes (" in output) and (") copied, " in output):
-            self.copiedamount = int(output.split(" ")[0])
+            try:
+                self.copiedamount = int(output.split(" ")[0])
+            except:
+                return
             output = output.replace("copied", text_copied)
             output = output.split("(")
             output = output[1].split(", ")
-        
+
             self.statusText.setText(text_status + " " + text_writing + " | " + output[3])
             self.statusText2.setText(output[0] + " " + text_copied + " | " + text_imagefile + ": " + str(self.selected_image_size) + " GB")
 
