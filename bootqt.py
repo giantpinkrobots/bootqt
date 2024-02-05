@@ -27,6 +27,8 @@ elif ((localename[0].startswith("it_")) and (os.path.exists(i18ndir + "it.py")))
     from bqi18n.it import *
 elif ((localename[0].startswith("tr_")) and (os.path.exists(i18ndir + "tr.py"))):
     from bqi18n.tr import *
+elif ((localename[0].startswith("pt_BR")) and (os.path.exists(i18ndir + "ptbr.py"))):
+    from bqi18n.ptbr import *
 else: #Default to English
     text_imageselected = "Image selected:"
     text_selectdrive = "Select Drive"
