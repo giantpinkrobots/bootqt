@@ -1,8 +1,7 @@
-#Bootqt v2024.1.4
+#Bootqt v2024.2.10
 import sys
 import os
 import time
-import locale
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar
 from PyQt5.QtCore import QProcess, QProcessEnvironment
 from PyQt5.QtGui import QIcon
@@ -16,18 +15,18 @@ else:
     isFlatpak = 0
 
 #i18n
-localename = locale.getlocale()
+localename = os.getenv("LANG")
 if (isFlatpak == 0): i18ndir = "./bqi18n/"
 else: i18ndir = "/app/lib/bootqt/bqi18n/"
-if ((localename[0].startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
+if ((localename.startswith("da_")) and (os.path.exists(i18ndir + "da.py"))):
     from bqi18n.da import *
-elif ((localename[0].startswith("de_")) and (os.path.exists(i18ndir + "de.py"))):
+elif ((localename.startswith("de_")) and (os.path.exists(i18ndir + "de.py"))):
     from bqi18n.de import *
-elif ((localename[0].startswith("it_")) and (os.path.exists(i18ndir + "it.py"))):
+elif ((localename.startswith("it_")) and (os.path.exists(i18ndir + "it.py"))):
     from bqi18n.it import *
-elif ((localename[0].startswith("tr_")) and (os.path.exists(i18ndir + "tr.py"))):
+elif ((localename.startswith("tr_")) and (os.path.exists(i18ndir + "tr.py"))):
     from bqi18n.tr import *
-elif ((localename[0].startswith("pt_BR")) and (os.path.exists(i18ndir + "ptbr.py"))):
+elif ((localename.startswith("pt_BR")) and (os.path.exists(i18ndir + "ptbr.py"))):
     from bqi18n.ptbr import *
 else: #Default to English
     text_imageselected = "Image selected:"
