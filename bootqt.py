@@ -1,4 +1,4 @@
-#Bootqt v2024.2.10
+#Bootqt v2025.4.18
 import sys
 import os
 import time
@@ -75,6 +75,13 @@ class bootqt(QWidget):
                 lsblk_model = os.popen("lsblk -io KNAME,MODEL | grep \""+i[0]+" \"").read()
                 lsblk_model = lsblk_model.split("\n")
                 drive_list.append("/dev/" + lsblk_model[0])
+
+        #Exclude boot drive from drive list:
+        boot_drive = os.popen("lsblk -no PKNAME \"$(findmnt -no SOURCE /boot || findmnt -no SOURCE /)\" | awk '{print \"/dev/\" $1}'").read()
+
+        for drive in drive_list:
+            if drive[1].startswith(boot_drive):
+                drive_list.remove(drive)
 
         #Drive list selection box:
         self.drives_selection_box = QComboBox()
