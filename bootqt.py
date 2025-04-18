@@ -2,9 +2,8 @@
 import sys
 import os
 import time
-from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar
-from PyQt5.QtCore import QProcess, QProcessEnvironment
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar
+from PyQt6.QtCore import QProcess, QProcessEnvironment
 
 global isFlatpak, text_imageselected, text_selectdrive, text_button_selectimagefile, text_selectimagefile, text_imagefile, text_button_preparedrive, text_status, text_ready, text_writing, text_error, text_errorwait, text_nodrive, text_noimage, text_areyousure, text_drivewillbewiped, text_imagewillbewritten, text_writestarted, text_writefinished, text_finished, text_copied
 
@@ -56,10 +55,6 @@ class bootqt(QWidget):
         self.setMinimumSize(400,253)
         self.setMaximumSize(400,253)
         self.setWindowTitle("Bootqt")
-        if (isFlatpak == 1):
-            self.setWindowIcon(QIcon("/app/lib/bootqt/bqlogo.png"))
-        else:
-            self.setWindowIcon(QIcon("./bqlogo.png"))
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -131,7 +126,7 @@ class bootqt(QWidget):
             error_message.setText(text_errorwait)
             error_message.setWindowTitle(text_error)
             error_message.setIcon(QMessageBox.Critical)
-            error_message.exec_()
+            error_message.exec()
             return;
         error = ""
         selected_drive = self.drives_selection_box.currentText()
@@ -144,11 +139,11 @@ class bootqt(QWidget):
             error_message.setText(error)
             error_message.setWindowTitle(text_error)
             error_message.setIcon(QMessageBox.Critical)
-            error_message.exec_()
+            error_message.exec()
         else:
             question_message = QMessageBox()
-            start_write = question_message.question(self,text_areyousure, text_drivewillbewiped+"\n" + selected_drive + "\n\n"+text_imagewillbewritten+"\n" + self.selected_image + "\n\n"+text_areyousure, question_message.Yes | question_message.No)
-            if start_write == question_message.Yes:
+            start_write = question_message.question(self,text_areyousure, text_drivewillbewiped+"\n" + selected_drive + "\n\n"+text_imagewillbewritten+"\n" + self.selected_image + "\n\n"+text_areyousure, question_message.StandardButton.Yes | question_message.StandardButton.No)
+            if start_write == question_message.StandardButton.Yes:
                 #Start writing
                 self.isWriting = 1
                 self.copiedamount = 0
@@ -189,7 +184,7 @@ class bootqt(QWidget):
             error_message.setText(text_errorwait)
             error_message.setWindowTitle(text_error)
             error_message.setIcon(QMessageBox.Critical)
-            error_message.exec_()
+            error_message.exec()
             return;
         showDialog = QFileDialog.getOpenFileName(
             parent = self,
@@ -225,7 +220,7 @@ class bootqt(QWidget):
         info_message = QMessageBox()
         info_message.setText(text_writefinished)
         info_message.setWindowTitle(text_finished)
-        info_message.exec_()
+        info_message.exec()
         self.isWriting = 0
         self.statusText.setText(text_status + " " + text_ready)
         self.statusText2.setText("")
@@ -250,4 +245,4 @@ if __name__ == "__main__":
     program = QApplication(sys.argv)
     bootqt = bootqt()
     bootqt.show()
-    sys.exit(program.exec_())
+    sys.exit(program.exec())
