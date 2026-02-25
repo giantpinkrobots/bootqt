@@ -1,4 +1,4 @@
-#Bootqt v2025.6.28
+#Bootqt v2026.2.25
 import sys
 import os
 import time

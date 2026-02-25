@@ -45,7 +45,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 #
 If you don't want to install through Flatpak, you have to download the "bootqt.py" file (not the one in the flatpak directory) and download the "bqi18n" folder if you want localization to work. Then, you'll need PyQt5. Here is how you can get it via pip:
 ```
-pip install PyQt5
+pip install PySide6
 ```
 Afterwards just run the script like so:
 ```
@@ -62,3 +62,4 @@ I know there are many other alternatives to Bootqt. But I wanted to try making a
 - Thanks to my friends for their help on German and Danish localization.
 - Thanks to [@albanobattistella](https://github.com/albanobattistella) for Italian localization.
 - Thanks to [@maxsonferovante](https://github.com/maxsonferovante) for Brazilian Portuguese localization.
+- Thanks to [@camegone](https://github.com/camegone) for Japanese localization.
