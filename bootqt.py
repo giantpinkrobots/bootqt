@@ -1,9 +1,12 @@
-#Bootqt v2026.2.25
+#Bootqt v2026.3.9
 import sys
 import os
 import time
+import json
+import subprocess
 from PySide6.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar
 from PySide6.QtCore import QProcess, QProcessEnvironment
+from PySide6.QtGui import QGuiApplication
 
 global isFlatpak, text_imageselected, text_selectdrive, text_button_selectimagefile, text_selectimagefile, text_imagefile, text_button_preparedrive, text_status, text_ready, text_writing, text_error, text_errorwait, text_nodrive, text_noimage, text_areyousure, text_drivewillbewiped, text_imagewillbewritten, text_writestarted, text_writefinished, text_finished, text_copied
 
@@ -55,6 +58,7 @@ class bootqt(QWidget):
         self.setMinimumSize(400,253)
         self.setMaximumSize(400,253)
         self.setWindowTitle("Bootqt")
+        QGuiApplication.setDesktopFileName("io.github.giantpinkrobots.bootqt")
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -65,23 +69,25 @@ class bootqt(QWidget):
         self.isWriting = 0
         self.copiedamount = 0
 
-        #Get drive list:
+        if (isFlatpak == 1):
+            drives_command_prefix = ["flatpak-spawn", "--host"]
+        else:
+            drives_command_prefix = []
+
+        lsblk_devices = subprocess.run(
+            drives_command_prefix + ["lsblk", "-J", "-o", "PATH,MODEL,TYPE,TRAN,RM"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        data = json.loads(lsblk_devices.stdout)
         drive_list = []
-        lsblk_output = os.popen("lsblk").read()
         drive_list.append(text_selectdrive)
-        for i in lsblk_output.splitlines():
-            if(i[0] != "├") and (i[0] != "└") and (i[0] == "s") and (i[1] == "d"):
-                i = i.split(" ")
-                lsblk_model = os.popen("lsblk -io KNAME,MODEL | grep \""+i[0]+" \"").read()
-                lsblk_model = lsblk_model.split("\n")
-                drive_list.append("/dev/" + lsblk_model[0])
 
-        #Exclude boot drive from drive list:
-        boot_drive = os.popen("lsblk -no PKNAME \"$(findmnt -no SOURCE /boot || findmnt -no SOURCE /)\" | awk '{print \"/dev/\" $1}'").read()
-
-        for drive in drive_list:
-            if drive[1].startswith(boot_drive):
-                drive_list.remove(drive)
+        for dev in data["blockdevices"]:
+            if dev["type"] == "disk" and dev.get("tran") == "usb":
+                drive_list.append(f"{dev["path"]}  —  {dev["model"]}")
 
         #Drive list selection box:
         self.drives_selection_box = QComboBox()
@@ -156,16 +162,17 @@ class bootqt(QWidget):
                 self.copiedamount = 0
                 self.progressBar.setValue(0)
                 self.text.appendPlainText(text_writestarted+" ("+time.strftime("%H:%M:%S", time.localtime())+")")
-                selected_drive_code = selected_drive.split(" ");
-                self.write_command = "dd bs=4M if=\""+self.selected_image+"\" of="+selected_drive_code[0]+" status=progress oflag=sync"
+                selected_drive_code = selected_drive.split(" ")[0];
+                print(selected_drive_code)
+                self.write_command = "dd bs=4M if=\""+self.selected_image+"\" of="+selected_drive_code+" status=progress oflag=sync"
                 if (isFlatpak == 1):
                     self.selected_image_size = (os.popen("flatpak-spawn --host ls -l \""+self.selected_image+"\"").read()).split(" ")[4]
-                    os.popen("flatpak-spawn --host umount "+selected_drive_code[0]+"*")
+                    os.popen("flatpak-spawn --host umount "+selected_drive_code+"*")
                     self.write_command_exec = ["--host", "--env=LANG=en_US.UTF-8", "pkexec", "sh", "-c", self.write_command]
                 else:
                     self.selected_image_size = (os.popen("ls -l \""+self.selected_image+"\"").read()).split(" ")[4]
-                    os.popen("umount "+selected_drive_code[0]+"*")
-                    self.write_command_exec = ["sh", "-c", self.write_command]
+                    os.popen("umount "+selected_drive_code+"*")
+                    self.write_command_exec = ["pkexec", "sh", "-c", self.write_command]
                 self.selected_image_size_bytes = float(self.selected_image_size)
                 self.selected_image_size = round((( (float(self.selected_image_size) / 1024 ) / 1024 ) / 1024 ), 2)
                 self.statusText.setText(text_status + " " + text_writing)
@@ -196,7 +203,7 @@ class bootqt(QWidget):
         showDialog = QFileDialog.getOpenFileName(
             parent = self,
             caption = text_selectimagefile,
-            filter = text_imagefile+"(*.iso *.img)"
+            filter = text_imagefile+"(*.iso *.img *.raw)"
         )
         if showDialog[0] != "":
             self.selected_image = showDialog[0]
