@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+<id>io.github.giantpinkrobots.bootqt</id>
+
+<name>Bootqt</name>
+<summary>Create bootable drives</summary>
+
+<metadata_license>FSFAP</metadata_license>
+<project_license>GPL-3.0-only</project_license>
+
+<developer_name>Giant Pink Robots!</developer_name>
+
+<content_rating type="oars-1.1" />
+<url type="homepage">https://github.com/giantpinkrobots/bootqt</url>
+
+<description>
+<p>
+Bootqt is a lightweight image writer that allows you to quickly create bootable USB drives. It can also download and apply the latest versions of various Linux distributions automatically, as well as install Ventoy onto your USB, which allows you to include many ISO files within a single drive.
+</p>
+</description>
+
+<launchable type="desktop-id">io.github.giantpinkrobots.bootqt.desktop</launchable>
+<screenshots>
+<screenshot type="default">
+<image>https://raw.githubusercontent.com/giantpinkrobots/bootqt/main/screenshots/Screenshot-Bootqt-1.png</image>
+</screenshot>
+<screenshot>
+<image>https://raw.githubusercontent.com/giantpinkrobots/bootqt/main/screenshots/Screenshot-Bootqt-2.png</image>
+</screenshot>
+<screenshot>
+<image>https://raw.githubusercontent.com/giantpinkrobots/bootqt/main/screenshots/Screenshot-Bootqt-3.png</image>
+</screenshot>
+</screenshots>
+
+<releases>
+<release version="v2026.5.13" date="2026-05-13">
+<description>
+<ul>
+    <li>New "Download" section for downloading various Linux distributions automatically, as well as Ventoy</li>
+</ul>
+</description>
+</release>
+</releases>
+</component>

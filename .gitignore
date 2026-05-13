@@ -1,1 +1,6 @@
 /bqi18n/__pycache__/
+venv
+.flatpak-builder
+.flatpak
+builddir
+.vscode

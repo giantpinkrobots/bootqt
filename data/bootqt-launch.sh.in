@@ -1,0 +1,3 @@
+#!/bin/bash
+pythonexec='@PYTHON@'
+$pythonexec /app/lib/bootqt/bootqt.py

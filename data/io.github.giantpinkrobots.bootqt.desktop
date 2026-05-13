@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
-Exec=bootqt.sh
+Exec=bootqt-launch.sh
 Icon=io.github.giantpinkrobots.bootqt
 Name=Bootqt
 Comment=Create bootable drives
 Categories=Utility
+Keywords=boot;usb;image;ventoy;etch
